@@ -1,48 +1,28 @@
-The purpose of this role is to start inventory hosts, instanciating them first
-if necessary. It will create / start any host which name ends in ``.lxc``.
+novafloss.ssh-agent
+~~~~~~~~~~~~~~~~~~~
 
-Note that you need ``lxc``, ``dsnmasq``, and ``sudo`` to be properly
-configured. And ``lxc-python2`` (which require ``lxc-dev``) installed in your
-ansible environement. That means that you can create a container with internet
-access and that you can resolve it by ``name.lxc``.
+Basic role to ensure an SSH agent is ready to use by ansible.
 
-Consider this example inventory::
-
-    [flow]
-    flow.lxc lxc_template_options='-r wheezy'
-
-    [rabbitmq]
-    rabbitmq.lxc
-
-    [redis]
-    redis.lxc
-
-And a playbook like that::
+Example usage::
 
     ---
 
     - hosts: localhost
-      become: true
-      become_user: root
-      become_method: sudo
       roles:
-      - pdoc.boot
+      - role: novafloss.ssh-agent
+        ssh_insecure: ['*.lxc']
 
-    - hosts: redis
-      roles:
-      - geerlingguy.redis
+This will:
 
-    - hosts: rabbitmq
-      roles:
-      - alexey.rabbitmq
+- ensure a default ssh key exists,
+- ensure ssh config dir have the right permissions,
+- ensure ssh config have the right permissions,
+- ensure an ssh key exists,
+- ensure ssh keys have the right permissions,
+- ensure an ssh agent is started and ``$SSH_AUTH_SOCK`` is defined,
+- enable insecure connection to ``*.lxc`` (or any host you add to
+  ``ssh_insecure``).
 
-First, pdoc.boot will start the containers and create them if they don't exist,
-then plays will be executed normally on rabbitmq and redis container hosts.
-
-Note that this will add to your ssh_config::
-
-    Host *.lxc
-        # No need for security for disposable test containers
-        UserKnownHostsFile /dev/null
-        StrictHostKeyChecking no
-        User root
+While this may be useless on an actual control machine, because obviously an
+ssh agent would already be properly configured, this is useful to execute tests
+on empty containers.
