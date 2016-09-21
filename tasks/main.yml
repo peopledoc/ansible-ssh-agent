@@ -46,4 +46,4 @@
           UserKnownHostsFile /dev/null
           StrictHostKeyChecking no
           User root
-  with_items: ssh_insecure
+  with_items: '{{ ssh_insecure }}'

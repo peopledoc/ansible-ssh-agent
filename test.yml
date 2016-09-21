@@ -4,3 +4,6 @@
   roles:
   - role: .
     ssh_insecure: ['*.lxc']
+
+  post_tasks:
+  - shell: grep '.lxc' ~/.ssh/config
